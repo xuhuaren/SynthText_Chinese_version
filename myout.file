@@ -1,0 +1,17 @@
+nohup: ignoring input
+[34;1mgetting data..[0m
+[34;1m	-> done[0m
+[32;1mStoring the output in: results/SynthText_cartoon_viz.h5[0m
+data/newsgroup/test1.txt
+Traceback (most recent call last):
+  File "gen.py", line 223, in <module>
+    main(args.viz)
+  File "gen.py", line 130, in main
+    RV3 = RendererV3(DATA_PATH,max_time=SECS_PER_IMG)
+  File "/data/home/xuhuaren/ft_local/SynthText_Chinese_version-master/synthgen.py", line 369, in __init__
+    self.text_renderer = tu.RenderFont(data_dir)
+  File "/data/home/xuhuaren/ft_local/SynthText_Chinese_version-master/text_utils.py", line 111, in __init__
+    fn=osp.join(data_dir,'newsgroup/'))
+  File "/data/home/xuhuaren/ft_local/SynthText_Chinese_version-master/text_utils.py", line 542, in __init__
+    print fc
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 15-17: ordinal not in range(128)
