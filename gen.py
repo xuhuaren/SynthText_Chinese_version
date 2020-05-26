@@ -16,6 +16,7 @@ Entry-point for generating synthetic text images, as described in:
 import numpy as np
 import h5py
 import os, sys, traceback
+os.environ["OMP_NUM_THREADS"] = "1"
 import os.path as osp
 from synthgen import *
 from common import *
@@ -130,7 +131,7 @@ def main(viz=False):
   if NUM_IMG < 0:
     NUM_IMG = N
   start_idx,end_idx = 0,min(NUM_IMG, N)
-
+  #end_idx = 1000
   RV3 = RendererV3(DATA_PATH,max_time=SECS_PER_IMG)
   for i in xrange(start_idx,end_idx):
     imname = imnames[i]
@@ -189,6 +190,7 @@ def main_bak(viz=False):
   if NUM_IMG < 0:
     NUM_IMG = N
   start_idx,end_idx = 0,min(NUM_IMG, N)
+  end_idx = 10
 
   RV3 = RendererV3(DATA_PATH,max_time=SECS_PER_IMG)
   
