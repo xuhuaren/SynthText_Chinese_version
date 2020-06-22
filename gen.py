@@ -16,7 +16,7 @@ Entry-point for generating synthetic text images, as described in:
 import numpy as np
 import h5py
 import os, sys, traceback
-#os.environ["OMP_NUM_THREADS"] = "2"
+os.environ["OMP_NUM_THREADS"] = "7"
 import os.path as osp
 from synthgen import *
 from common import *
@@ -25,7 +25,8 @@ import cv2 as cv
 import time 
 import os
 #os.system("export LANG=en_US.UTF-8")
-import sys  
+import sys 
+from concurrent import futures 
 reload(sys)  
 sys.setdefaultencoding('utf8')
 ## Define some configuration variables:
@@ -39,8 +40,11 @@ DB_FNAME = osp.join(DATA_PATH,'dset_8000.h5')
 # url of the data (google-drive public file):
 DATA_URL = 'http://www.robots.ox.ac.uk/~ankush/data.tar.gz'
 OUT_FILE = 'results/SynthText_8k_parallel.h5'
-executor = futures.ThreadPoolExecutor(max_workers=10)
-
+executor = futures.ThreadPoolExecutor(max_workers=14)
+imnames = None
+db = None
+RV3 = None
+viz = None
 def get_data():
   """
   Download the image,depth and segmentation data:
@@ -116,9 +120,9 @@ def rgb2gray(image):
 
 
 
-def single_line(temps):
-    i = temps
-    os.environ["OMP_NUM_THREADS"] = "1"
+def single_line(i):
+
+    #os.environ["OMP_NUM_THREADS"] = "1"
     imname = imnames[i]
     try:
       # get the image:
@@ -135,7 +139,7 @@ def single_line(temps):
       img = np.array(img.resize(sz,Image.ANTIALIAS))
       seg = np.array(Image.fromarray(seg).resize(sz,Image.NEAREST))
 
-      print colorize(Color.RED,'%d of %d'%(i,end_idx-1), bold=True)
+      #print colorize(Color.RED,'%d of %d'%(i,end_idx-1), bold=True)
       res = RV3.render_text(img,depth,seg,area,label,
                             ninstance=INSTANCE_PER_IMAGE,viz=viz)
       if len(res) > 0:
@@ -144,34 +148,40 @@ def single_line(temps):
       # visualize the output:
       if viz:
         if 'q' in raw_input(colorize(Color.RED,'continue? (enter to continue, q to exit): ',True)):
-          break
+          return 
     except:
       traceback.print_exc()
       print colorize(Color.GREEN,'>>>> CONTINUING....', bold=True)
-      continue 
+      #continue 
   
 
-def main_para(viz=False):
+def main_para(viz_local=False):
+    
+  global imnames 
+  global db
+  global RV3
+  global viz
+  viz = viz_local
   # open databases:
   print colorize(Color.BLUE,'getting data..',bold=True)
-  global viz = viz
-  global db = get_data()
+  db = get_data()
   print colorize(Color.BLUE,'\t-> done',bold=True)
 
   # open the output h5 file:
   out_db = h5py.File(OUT_FILE,'w')
+  out_db.atomic = True
   out_db.create_group('/data')
   print colorize(Color.GREEN,'Storing the output in: '+OUT_FILE, bold=True)
 
   # get the names of the image files in the dataset:
-  global imnames = sorted(db['image'].keys())
+  imnames = sorted(db['image'].keys())
   N = len(imnames)
   global NUM_IMG
   if NUM_IMG < 0:
     NUM_IMG = N
   start_idx,end_idx = 0,min(NUM_IMG, N)
   temps = [i for i in range(start_idx,end_idx)]
-  global RV3 = RendererV3(DATA_PATH,max_time=SECS_PER_IMG)  
+  RV3 = RendererV3(DATA_PATH,max_time=SECS_PER_IMG)  
   executor.map(single_line, temps)
   db.close()
   out_db.close()   
