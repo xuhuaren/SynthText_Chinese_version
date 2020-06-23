@@ -21,7 +21,8 @@ import text_utils as tu
 from colorize3_poisson import Colorize
 from common import *
 import traceback, itertools
-
+from gevent import Timeout
+import time
 
 class TextRegions(object):
     """
@@ -376,7 +377,8 @@ class RendererV3(object):
         self.max_text_regions = 7
 
         self.max_time = max_time
-
+        #self.max_time = None
+        
     def filter_regions(self,regions,filt):
         """
         filt : boolean list of regions to keep.
@@ -655,14 +657,20 @@ class RendererV3(object):
                 ireg = reg_idx[idx]
                 try:
                     if self.max_time is None:
+
+   
                         txt_render_res = self.place_text(img,place_masks[ireg],
                                                          regions['homography'][ireg],
                                                          regions['homography_inv'][ireg])
+
                     else:
+                        start = time.time()
                         with time_limit(self.max_time):
+                            #print("inside")
                             txt_render_res = self.place_text(img,place_masks[ireg],
                                                              regions['homography'][ireg],
                                                              regions['homography_inv'][ireg])
+                        print(time.time() - start)
                 except TimeoutException, msg:
                     print msg
                     continue

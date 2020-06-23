@@ -359,4 +359,4 @@ if __name__=='__main__':
   parser = argparse.ArgumentParser(description='Genereate Synthetic Scene-Text Images')
   parser.add_argument('--viz',action='store_true',dest='viz',default=False,help='flag for turning on visualizations')
   args = parser.parse_args()
-  main_para(args.viz)
+  main(args.viz)
