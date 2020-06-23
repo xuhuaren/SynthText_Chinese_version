@@ -16,7 +16,7 @@ Entry-point for generating synthetic text images, as described in:
 import numpy as np
 import h5py
 import os, sys, traceback
-os.environ["OMP_NUM_THREADS"] = "7"
+os.environ["OMP_NUM_THREADS"] = "1"
 import os.path as osp
 from synthgen import *
 from common import *
