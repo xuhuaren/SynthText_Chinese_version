@@ -21,7 +21,7 @@ import text_utils as tu
 from colorize3_poisson import Colorize
 from common import *
 import traceback, itertools
-from gevent import Timeout
+#from gevent import Timeout
 import time
 
 class TextRegions(object):
