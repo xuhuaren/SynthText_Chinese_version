@@ -134,11 +134,12 @@ def main(args = None):
   imnames = sorted(db['image'].keys())
   N = len(imnames)
   #global NUM_IMG
-  #if NUM_IMG < 0:
-  #  NUM_IMG = N
+  if NUM_IMG < 0:
+    NUM_IMG = N
   start_idx = int(((data_id - 1)/10.0) * N)
   end_idx = int(((data_id)/10.0) * N - 1)
-  #end_idx = 1000
+  
+  print("start_index_" + str(start_idx) + "end_index_" + str(end_idx))
   RV3 = RendererV3(DATA_PATH,max_time=SECS_PER_IMG)
   for i in xrange(start_idx,end_idx):
     imname = imnames[i]
